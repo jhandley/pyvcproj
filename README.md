@@ -1,7 +1,5 @@
-pyvcproj
+pyvcproj [![Build Status](https://travis-ci.org/jhandley/pyvcproj.svg)](https://travis-ci.org/jhandley/pyvcproj)
 ========
-
-[![Build Status](https://travis-ci.org/jhandley/pycvproj.png?branch=master)](https://travis-ci.org/jhandley/pycvproj)
 
 Manipulate Visual Studio project and solution files from Python.
 Currently only tested with Visual Studio 2010.
