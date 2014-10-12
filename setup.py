@@ -1,10 +1,11 @@
 from distutils.core import setup
 from setuptools.command.test import test as TestCommand
+import sys
 
 class PyTest(TestCommand):
     def finalize_options(self):
         TestCommand.finalize_options(self)
-        self.test_args = ['--strict', '--verbose', '--tb=long', 'tests']
+        self.test_args = ['--strict', '--verbose', '--tb=long']
         self.test_suite = True
 
     def run_tests(self):
