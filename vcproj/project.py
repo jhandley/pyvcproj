@@ -1,6 +1,8 @@
 import xml.etree.ElementTree as ET
 import re
 
+__all__ = ['Project', 'parse']
+
 _MS_BUILD_NAMESPACE = "http://schemas.microsoft.com/developer/msbuild/2003"
 _REGEX_CONFIG_CONDITION = re.compile(r"""'\$\(Configuration\)\|\$\(Platform\)'=='(\w+)\|(\w+)'""")
 
@@ -11,12 +13,19 @@ def _matches_platform_configuration(item_group, platform, configuration):
     (p, c) = _parse_config_condition(item_group.attrib['Condition'])
     return (p == "All Configurations" or p == platform) and (c == "All Configurations" or c == configuration)
 
+# ET.register_namespace doesn't exist before python 2.7
+try:
+    _register_namespace = ET.register_namespace
+except AttributeError:
+    def _register_namespace(prefix, uri):
+        ET._namespace_map[uri] = prefix
+
 class Project(object):
     """Visual C++ project file (.vcxproj)."""
 
     def __init__(self, filename):
         """Create a Project instance for project file *filename*."""
-        ET.register_namespace('', _MS_BUILD_NAMESPACE)
+        _register_namespace('', _MS_BUILD_NAMESPACE)
         self.filename = filename
         self.xml = ET.parse(filename)
 
