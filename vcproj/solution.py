@@ -1,4 +1,8 @@
+"""Visual Studio Solution File."""
+
 import re, codecs
+
+__all__ = ['Solution', 'parse']
 
 class SolutionFileError(Exception):
     pass
@@ -98,7 +102,7 @@ class Solution(object):
     def write(self, filename = None):
         """Save solution file."""
         filename = filename or self.filename
-        with codecs.open(filename, "w", "utf-8-sig") as f:
+        with codecs.open(filename, "wb", "utf-8-sig") as f:
             f.write("\r\nMicrosoft Visual Studio Solution File, Format Version 11.00\r\n")
             f.write("# Visual Studio 2010\r\n")
             for project in self.projects:

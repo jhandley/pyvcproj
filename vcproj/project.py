@@ -31,11 +31,11 @@ class Project(object):
 
     def source_files(self):
         """List source files in project."""
-        return [c.attrib['Include'] for c in self.xml.findall(".//{" + _MS_BUILD_NAMESPACE + "}ClCompile[@Include]")]
+        return [c.attrib['Include'] for c in self.xml.findall(".//{" + _MS_BUILD_NAMESPACE + "}ClCompile") if 'Include' in c.attrib]
 
     def include_files(self):
         """List include files in project."""
-        return [c.attrib['Include'] for c in self.xml.findall(".//{" + _MS_BUILD_NAMESPACE + "}ClInclude[@Include]")]
+        return [c.attrib['Include'] for c in self.xml.findall(".//{" + _MS_BUILD_NAMESPACE + "}ClInclude") if 'Include' in c.attrib]
     
     def __item_groups_for_config(self, platform, configuration):
         groups = self.xml.findall("./{" + _MS_BUILD_NAMESPACE + "}ItemDefinitionGroup")
