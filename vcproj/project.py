@@ -1,3 +1,5 @@
+"""Visual C++ project file."""
+
 import xml.etree.ElementTree as ET
 import re
 
@@ -51,12 +53,15 @@ class Project(object):
         return item.text.split(';')
         
     def additional_link_dependencies(self, platform, configuration):
+        """List libraries linked to by this project"""
         return self.__item_group_item_for_config(platform, configuration, "Link", "AdditionalDependencies")
         
     def additional_include_directories(self, platform, configuration):
+        """List additional include directories for this project"""
         return self.__item_group_item_for_config(platform, configuration, "ClCompile", "AdditionalIncludeDirectories")
 
     def set_additional_include_directories(self, additional_includes):
+        """Set additional include directories for this project"""
         include_nodes = self.xml.findall("./{" + self.__MS_BUILD_NAMESPACE + "}ItemDefinitionGroup/{" +
                                          self.__MS_BUILD_NAMESPACE + "}ClCompile/{" +
                                          self.__MS_BUILD_NAMESPACE + "}AdditionalIncludeDirectories")
@@ -69,5 +74,5 @@ class Project(object):
         self.xml.write(filename, xml_declaration=True, encoding='utf-8', method="xml")
         
 def parse(filename):
-    """Parse project file *filename* and return Project instance."""
+    """Parse project file filename and return Project instance."""
     return Project(filename)

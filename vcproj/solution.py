@@ -119,5 +119,5 @@ class Solution(object):
             f.write("EndGlobal\r\n")
 
 def parse(filename):
-    """Parse solution file *filename* and return Solution instance."""
+    """Parse solution file filename and return Solution instance."""
     return Solution(filename)
