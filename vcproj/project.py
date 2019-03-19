@@ -56,7 +56,7 @@ class Project(object):
     
     def __item_groups_for_config(self, platform, configuration):
         groups = self.xml.findall("./{" + _MS_BUILD_NAMESPACE + "}ItemDefinitionGroup")
-        return filter(lambda g: _matches_platform_configuration(g.attrib['Condition'], platform, configuration), groups)
+        return list(filter(lambda g: _matches_platform_configuration(g.attrib['Condition'], platform, configuration), groups))
 
     def __item_group_item_for_config(self, platform, configuration, subgroup_name, item_name):
         groups = self.__item_groups_for_config(platform, configuration)
@@ -148,9 +148,11 @@ class Project(object):
 
     def set_additional_include_directories(self, platform, configuration, additional_includes):
         """Set additional include directories for this project"""
+
+        dirs = ";".join(additional_includes) if additional_includes is not None else None
         self.__set_item_group_items_for_config(platform, configuration,
                                                "ClCompile", "AdditionalIncludeDirectories",
-                                               string.join(additional_includes, ';') if additional_includes is not None else None)
+                                               dirs)
 
     def output_file(self, platform, configuration):
         """Get output file name for this project"""
