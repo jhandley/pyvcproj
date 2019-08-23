@@ -1,4 +1,4 @@
-from distutils.core import setup
+from setuptools import setup
 from setuptools.command.test import test as TestCommand
 import sys
 
@@ -21,6 +21,7 @@ setup(name='vcproj',
       author_email='josh@teleyah.com',
       tests_require=['pytest'],
       url='http://github.com/jhandley/pyvcproj',
+      py_modules=['vcproj'],
       packages=['vcproj'],
       cmdclass={'test': PyTest},
      )
