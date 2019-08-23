@@ -15,12 +15,13 @@
 # It will then make the OutputFile property use the $OutDir variable to
 # appease the warning.
 
-import vcproj
+import vcproj.solution
+import vcproj.project
 import os, sys
 
 def main(argv):
   if len(argv) < 3:
-      print "Usage: " + argv[0] + " <solution file> <bin directory> <lib directory>"
+      print("Usage: " + argv[0] + " <solution file> <bin directory> <lib directory>")
       sys.exit(2)
   solution_path = argv[1]
   solution_dir = os.path.dirname(solution_path)

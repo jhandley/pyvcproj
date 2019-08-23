@@ -8,12 +8,13 @@
 # This script will set Enable Incremental Linking to true to appease
 # the warning.
 
-import vcproj
+import vcproj.solution
+import vcproj.project
 import os, sys
 
 def main(argv):
   if len(argv) < 2:
-      print "Usage: " + argv[0] + " <solution file>"
+      print("Usage: " + argv[0] + " <solution file>")
       sys.exit(2)
   solution_path = argv[1]
   solution_dir = os.path.dirname(solution_path)
@@ -23,7 +24,7 @@ def main(argv):
     if project.configuration_type() != "StaticLibrary":
       # Check for mismatched incr linking and debug format, debug format of None means default which is EditAndContinue
       if project.enable_incremental_linking('Debug', 'Win32') == False and project.debug_information_format('Debug', 'Win32') in ['EditAndContinue', None]:
-        print "Set enable incremental to false for " + project_file
+        print("Set enable incremental to false for " + project_file)
         project.set_enable_incremental_linking('Debug', 'Win32', None)
         project.write()
 
