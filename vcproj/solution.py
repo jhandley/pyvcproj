@@ -4,14 +4,17 @@ import re, codecs
 
 __all__ = ['Solution', 'parse']
 
+
 class SolutionFileError(Exception):
     pass
+
 
 _REGEX_PROJECT_FILE = re.compile(r'Project\("\{([^\}]+)\}"\)[\s=]+"([^\"]+)",\s"(.+proj)", "(\{[^\}]+\})"')
 _REGEX_END_PROJECT = re.compile(r"""\s*EndProject""")
 _REGEX_PROJECT_DEPENDENCIES_SECTION = re.compile(r"""\s*ProjectSection\((\w+)\) = postProject""")
 _REGEX_END_PROJECT_SECTION = re.compile(r"""\s*EndProjectSection""")
 _REGEX_DEPENDENCY = re.compile(r"""\s*(\{[A-Za-z0-9-]+\})\s*=\s*(\{[A-Za-z0-9-]+\})""")
+
 
 class Solution(object):
     """Visual C++ solution file (.sln)."""
@@ -36,7 +39,7 @@ class Solution(object):
     @staticmethod
     def __read_project(project, f):
         dependencies = []
-        while True:                          
+        while True:
             line = f.readline().decode('utf-8')
             if line is None:
                 raise SolutionFileError("Missing end project")
@@ -45,11 +48,11 @@ class Solution(object):
             if _REGEX_PROJECT_DEPENDENCIES_SECTION.match(line):
                 dependencies = Solution.__read_dependencies(f)
         return project + (dependencies,)
-    
+
     @staticmethod
     def __read_dependencies(f):
         dependencies = []
-        while True:                          
+        while True:
             line = f.readline().decode('utf-8')
             if line is None:
                 raise SolutionFileError("Missing end dependencies section")
@@ -63,7 +66,7 @@ class Solution(object):
     @staticmethod
     def __read_global(f):
         result = ""
-        while True:                          
+        while True:
             line = f.readline().decode('utf-8')
             if line is None:
                 raise SolutionFileError("Missing end global")
@@ -71,7 +74,7 @@ class Solution(object):
                 break
             result += line
         return result
-    
+
     def project_files(self):
         """List project files (.vcxproj.) in solution."""
         return map(lambda p: p[2], self.projects)
@@ -94,15 +97,15 @@ class Solution(object):
             raise SolutionFileError("Can't find project with name " + project_name)
         index = self.projects.index(project)
         self.projects[index] = project[0:4] + (map(lambda d: self.__project_from_name(d)[3], dependencies),)
-    
+
     def __project_from_name(self, project_name):
         return next((p for p in self.projects if p[1] == project_name), None)
 
     def __project_from_id(self, project_id):
-        projs = list(filter(lambda p: p[3] == project_id, self.projects ))
+        projs = list(filter(lambda p: p[3] == project_id, self.projects))
         return projs[0]
 
-    def write(self, filename = None):
+    def write(self, filename=None):
         """Save solution file."""
         filename = filename or self.filename
         with codecs.open(filename, "wb", "utf-8-sig") as f:
@@ -120,6 +123,7 @@ class Solution(object):
             f.write("Global\r\n")
             f.write(self.globals)
             f.write("EndGlobal\r\n")
+
 
 def parse(filename):
     """Parse solution file filename and return Solution instance."""

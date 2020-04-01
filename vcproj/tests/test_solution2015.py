@@ -1,6 +1,10 @@
-import vcproj.solution
-import tempfile, filecmp
+import filecmp
+import tempfile
+
 import pytest
+
+import vcproj.solution
+
 
 @pytest.fixture(scope="session")
 def test_sol():
@@ -19,7 +23,6 @@ def test_project_names(test_sol):
 
 
 def test_project_files(test_sol):
-
     proj_files = list(test_sol.project_files())
 
     assert 'PrivateLib\\PrivateLib.vcxproj' in proj_files
@@ -28,15 +31,16 @@ def test_project_files(test_sol):
 
 
 def test_dependencies(test_sol):
-
     deps = list(test_sol.dependencies('DXHHTest'))
 
     assert deps == ['Public', 'MDraw']
-    
+
+
 def test_set_dependencies():
     s = vcproj.solution.parse('vcproj/tests/test_solution/test.sln')
     s.set_dependencies('lib1', ['lib2'])
     assert list(s.dependencies('lib1')) == ['lib2']
+
 
 def test_write():
     s = vcproj.solution.parse('vcproj/tests/test_solution/test.sln')
@@ -44,5 +48,3 @@ def test_write():
     temp.close()
     s.write(temp.name)
     assert filecmp.cmp('vcproj/tests/test_solution/test.sln', temp.name)
-    
-    

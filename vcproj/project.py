@@ -1,19 +1,22 @@
 """Visual C++ project file."""
 
+import re
 import xml.etree.ElementTree as ET
-import re, string
 
 __all__ = ['Project', 'parse']
 
 _MS_BUILD_NAMESPACE = "http://schemas.microsoft.com/developer/msbuild/2003"
 _REGEX_CONFIG_CONDITION = re.compile(r"""'\$\(Configuration\)\|\$\(Platform\)'=='(\w+)\|(\w+)'""")
 
+
 def _parse_config_condition(condition):
     return _REGEX_CONFIG_CONDITION.match(condition).groups()
+
 
 def _matches_platform_configuration(condition, platform, configuration):
     (p, c) = _parse_config_condition(condition)
     return (platform == "All Configurations" or p == platform) and (configuration == "All Configurations" or c == configuration)
+
 
 # ET.register_namespace doesn't exist before python 2.7
 try:
@@ -21,6 +24,7 @@ try:
 except AttributeError:
     def _register_namespace(prefix, uri):
         ET._namespace_map[uri] = prefix
+
 
 class Project(object):
     """Visual C++ project file (.vcxproj)."""
@@ -35,7 +39,7 @@ class Project(object):
         """Project type (Application, StaticLibrary or DynamicLibrary)."""
         return self.__property_group_item_for_config('All Configurations', 'All Configurations', 'Configuration', 'ConfigurationType')
 
-    def configurations(self, platform = 'All Configurations', configuration = 'All Configurations'):
+    def configurations(self, platform='All Configurations', configuration='All Configurations'):
         """List available configurations for this project as list of tuples (config, platform)"""
         item_groups = self.xml.findall("./{" + _MS_BUILD_NAMESPACE + "}ItemGroup")
         config_groups = (item_group for item_group in item_groups if item_group.attrib.get('Label', None) == 'ProjectConfigurations')
@@ -45,7 +49,7 @@ class Project(object):
             item_platform = config_item.find("./{" + _MS_BUILD_NAMESPACE + "}Platform").text
             if (platform == 'All Configurations' or item_platform == platform) and (configuration == 'All Configurations' or item_config == configuration):
                 yield (item_config, item_platform)
-    
+
     def source_files(self):
         """List source files in project."""
         return [c.attrib['Include'] for c in self.xml.findall(".//{" + _MS_BUILD_NAMESPACE + "}ClCompile") if 'Include' in c.attrib]
@@ -53,7 +57,7 @@ class Project(object):
     def include_files(self):
         """List include files in project."""
         return [c.attrib['Include'] for c in self.xml.findall(".//{" + _MS_BUILD_NAMESPACE + "}ClInclude") if 'Include' in c.attrib]
-    
+
     def __item_groups_for_config(self, platform, configuration):
         groups = self.xml.findall("./{" + _MS_BUILD_NAMESPACE + "}ItemDefinitionGroup")
         return list(filter(lambda g: _matches_platform_configuration(g.attrib['Condition'], platform, configuration), groups))
@@ -99,7 +103,7 @@ class Project(object):
             # so ensure that we always call with specific configs.
             for config in self.configurations(platform, configuration):
                 self.__set_property_group_items_for_config(config[0], config[1], label, item_name, val)
-        else:           
+        else:
             property_groups = self.xml.findall("./{" + _MS_BUILD_NAMESPACE + "}PropertyGroup")
             label_matching_groups = (group for group in property_groups if group.attrib.get('Label', None) == label)
             condition_matching_groups = (g for g in label_matching_groups
@@ -140,7 +144,7 @@ class Project(object):
         """List libraries linked to by this project"""
         link_deps = self.__item_group_item_for_config(platform, configuration, "Link", "AdditionalDependencies")
         return link_deps.split(';') if link_deps is not None else None
-        
+
     def additional_include_directories(self, platform, configuration):
         """List additional include directories for this project"""
         includes = self.__item_group_item_for_config(platform, configuration, "ClCompile", "AdditionalIncludeDirectories")
@@ -158,7 +162,7 @@ class Project(object):
         """Get output file name for this project"""
         group_name = "Lib" if self.configuration_type() == "StaticLibrary" else "Link"
         return self.__item_group_item_for_config(platform, configuration, group_name, "OutputFile")
-        
+
     def set_output_file(self, platform, configuration, output_file_name):
         """Set output file name for this project"""
         group_name = "Lib" if self.configuration_type() == "StaticLibrary" else "Link"
@@ -188,7 +192,7 @@ class Project(object):
     def set_debug_information_format(self, platform, configuration, information_format):
         """Set program database format (ProgramDatabase, EditAndContinue or OldStyle)."""
         return self.__set_item_group_items_for_config(platform, configuration, "ClCompile", "DebugInformationFormat", information_format)
-    
+
     def enable_incremental_linking(self, platform, configuration):
         """Whether or not incremental linking is enabled."""
         string_value = self.__property_group_item_for_config(platform, configuration, None, 'LinkIncremental')
@@ -204,11 +208,12 @@ class Project(object):
         string_value = None if link_incremental is None else str(link_incremental).lower()
         self.__set_property_group_items_for_config(platform, configuration, None, 'LinkIncremental', string_value)
 
-    def write(self, filename = None):
+    def write(self, filename=None):
         """Save project file."""
         filename = filename or self.filename
         self.xml.write(filename, xml_declaration=True, encoding='utf-8', method="xml")
-        
+
+
 def parse(filename):
     """Parse project file filename and return Project instance."""
     return Project(filename)
