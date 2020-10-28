@@ -9,6 +9,11 @@ _MS_BUILD_NAMESPACE = "http://schemas.microsoft.com/developer/msbuild/2003"
 _REGEX_CONFIG_CONDITION = re.compile(r"""'\$\(Configuration\)\|\$\(Platform\)'=='(\w+)\|(\w+)'""")
 
 
+def parse(filename):
+    """Parse project file filename and return Project instance."""
+    return Project(filename)
+
+
 def _parse_config_condition(condition):
     return _REGEX_CONFIG_CONDITION.match(condition).groups()
 
@@ -212,8 +217,3 @@ class Project(object):
         """Save project file."""
         filename = filename or self.filename
         self.xml.write(filename, xml_declaration=True, encoding='utf-8', method="xml")
-
-
-def parse(filename):
-    """Parse project file filename and return Project instance."""
-    return Project(filename)

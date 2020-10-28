@@ -1,19 +1,24 @@
 """Visual Studio Solution File."""
 
-import re, codecs
-
 __all__ = ['Solution', 'parse']
 
-
-class SolutionFileError(Exception):
-    pass
-
+import codecs
+import re
 
 _REGEX_PROJECT_FILE = re.compile(r'Project\("\{([^\}]+)\}"\)[\s=]+"([^\"]+)",\s"(.+proj)", "(\{[^\}]+\})"')
 _REGEX_END_PROJECT = re.compile(r"""\s*EndProject""")
 _REGEX_PROJECT_DEPENDENCIES_SECTION = re.compile(r"""\s*ProjectSection\((\w+)\) = postProject""")
 _REGEX_END_PROJECT_SECTION = re.compile(r"""\s*EndProjectSection""")
 _REGEX_DEPENDENCY = re.compile(r"""\s*(\{[A-Za-z0-9-]+\})\s*=\s*(\{[A-Za-z0-9-]+\})""")
+
+
+def parse(filename):
+    """Parse solution file filename and return Solution instance."""
+    return Solution(filename)
+
+
+class SolutionFileError(Exception):
+    pass
 
 
 class Solution(object):
@@ -123,8 +128,3 @@ class Solution(object):
             f.write("Global\r\n")
             f.write(self.globals)
             f.write("EndGlobal\r\n")
-
-
-def parse(filename):
-    """Parse solution file filename and return Solution instance."""
-    return Solution(filename)
