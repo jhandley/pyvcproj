@@ -37,7 +37,7 @@ class Solution(object):
                     if match:
                         self.projects.append(Solution.__read_project(match.groups(), f))
                     else:
-                        print('No MATCH: {0}'.format(line))
+                        print(f'No MATCH: {line}')
                 elif line.startswith('Global'):
                     self.globals = Solution.__read_global(f)
 
@@ -92,14 +92,14 @@ class Solution(object):
         """List names of projects dependent on project *project_name*"""
         project = self.__project_from_name(project_name)
         if not project:
-            raise SolutionFileError("Can't find project with name " + project_name)
+            raise SolutionFileError(f"Can't find project with name {project_name}")
         return map(lambda d: self.__project_from_id(d)[1], project[4])
 
     def set_dependencies(self, project_name, dependencies):
         """Set names of projects dependent on project *project_name* to *dependencies*"""
         project = self.__project_from_name(project_name)
         if not project:
-            raise SolutionFileError("Can't find project with name " + project_name)
+            raise SolutionFileError(f"Can't find project with name {project_name}")
         index = self.projects.index(project)
         self.projects[index] = project[0:4] + (map(lambda d: self.__project_from_name(d)[3], dependencies),)
 
@@ -116,13 +116,13 @@ class Solution(object):
         with codecs.open(filename, 'wb', 'utf-8-sig') as f:
             f.write('\r\nMicrosoft Visual Studio Solution File, Format Version 11.00\r\n')
             f.write('# Visual Studio 2010\r\n')
-            for project in self.projects:
-                f.write('Project("{{{0}}}") = "{1}", "{2}", "{3}"\r\n'.format(*project[0:4]))
-                dependencies = project[4]
+            for p in self.projects:
+                f.write(f'Project("{{{p[0]}}}") = "{p[1]}", "{p[2]}", "{p[3]}"\r\n')
+                dependencies = p[4]
                 if dependencies:
                     f.write('\tProjectSection(ProjectDependencies) = postProject\r\n')
                     for d in dependencies:
-                        f.write('\t\t{0} = {0}\r\n'.format(d))
+                        f.write(f'\t\t{d} = {d}\r\n')
                     f.write('\tEndProjectSection\r\n')
                 f.write('EndProject\r\n')
             f.write('Global\r\n')
