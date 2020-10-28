@@ -4,7 +4,9 @@ __all__ = ['Solution', 'parse']
 
 import codecs
 import re
+from collections import namedtuple
 
+_Project = namedtuple('_Project', 'type_guid,name,path,guid,dependencies')
 _REGEX_PROJECT_FILE = re.compile(r'Project\("\{([^\}]+)\}"\)[\s=]+"([^\"]+)",\s"(.+proj)", "(\{[^\}]+\})"')
 _REGEX_END_PROJECT = re.compile(r'\s*EndProject')
 _REGEX_PROJECT_DEPENDENCIES_SECTION = re.compile(r'\s*ProjectSection\((\w+)\) = postProject')
@@ -52,7 +54,7 @@ class Solution(object):
                 break
             if _REGEX_PROJECT_DEPENDENCIES_SECTION.match(line):
                 dependencies = Solution.__read_dependencies(f)
-        return project + (dependencies,)
+        return _Project(*project, dependencies)
 
     @staticmethod
     def __read_dependencies(f):
@@ -82,18 +84,18 @@ class Solution(object):
 
     def project_files(self):
         """List project files (.vcxproj.) in solution."""
-        return map(lambda p: p[2], self.projects)
+        return map(lambda p: p.path, self.projects)
 
     def project_names(self):
         """List project files (.vcxproj.) in solution."""
-        return map(lambda p: p[1], self.projects)
+        return map(lambda p: p.name, self.projects)
 
     def dependencies(self, project_name):
         """List names of projects dependent on project *project_name*"""
         project = self.__project_from_name(project_name)
         if not project:
             raise SolutionFileError(f"Can't find project with name {project_name}")
-        return map(lambda d: self.__project_from_id(d)[1], project[4])
+        return map(lambda d: self.__project_from_id(d)[1], project.dependencies)
 
     def set_dependencies(self, project_name, dependencies):
         """Set names of projects dependent on project *project_name* to *dependencies*"""
@@ -101,13 +103,13 @@ class Solution(object):
         if not project:
             raise SolutionFileError(f"Can't find project with name {project_name}")
         index = self.projects.index(project)
-        self.projects[index] = project[0:4] + (map(lambda d: self.__project_from_name(d)[3], dependencies),)
+        self.projects[index] = _Project(*project[0:4], map(lambda d: self.__project_from_name(d)[3], dependencies))
 
     def __project_from_name(self, project_name):
-        return next((p for p in self.projects if p[1] == project_name), None)
+        return next((p for p in self.projects if p.name == project_name), None)
 
     def __project_from_id(self, project_id):
-        projs = list(filter(lambda p: p[3] == project_id, self.projects))
+        projs = list(filter(lambda p: p.guid == project_id, self.projects))
         return projs[0]
 
     def write(self, filename=None):
