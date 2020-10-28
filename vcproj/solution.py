@@ -6,10 +6,10 @@ import codecs
 import re
 
 _REGEX_PROJECT_FILE = re.compile(r'Project\("\{([^\}]+)\}"\)[\s=]+"([^\"]+)",\s"(.+proj)", "(\{[^\}]+\})"')
-_REGEX_END_PROJECT = re.compile(r"""\s*EndProject""")
-_REGEX_PROJECT_DEPENDENCIES_SECTION = re.compile(r"""\s*ProjectSection\((\w+)\) = postProject""")
-_REGEX_END_PROJECT_SECTION = re.compile(r"""\s*EndProjectSection""")
-_REGEX_DEPENDENCY = re.compile(r"""\s*(\{[A-Za-z0-9-]+\})\s*=\s*(\{[A-Za-z0-9-]+\})""")
+_REGEX_END_PROJECT = re.compile(r'\s*EndProject')
+_REGEX_PROJECT_DEPENDENCIES_SECTION = re.compile(r'\s*ProjectSection\((\w+)\) = postProject')
+_REGEX_END_PROJECT_SECTION = re.compile(r'\s*EndProjectSection')
+_REGEX_DEPENDENCY = re.compile(r'\s*(\{[A-Za-z0-9-]+\})\s*=\s*(\{[A-Za-z0-9-]+\})')
 
 
 def parse(filename):
@@ -32,13 +32,13 @@ class Solution(object):
             line = f.readline()
             while line:
                 line = f.readline().decode('utf-8')
-                if line.startswith("Project"):
+                if line.startswith('Project'):
                     match = _REGEX_PROJECT_FILE.match(line)
                     if match:
                         self.projects.append(Solution.__read_project(match.groups(), f))
                     else:
                         print('No MATCH: {0}'.format(line))
-                elif line.startswith("Global"):
+                elif line.startswith('Global'):
                     self.globals = Solution.__read_global(f)
 
     @staticmethod
@@ -70,12 +70,12 @@ class Solution(object):
 
     @staticmethod
     def __read_global(f):
-        result = ""
+        result = ''
         while True:
             line = f.readline().decode('utf-8')
             if line is None:
                 raise SolutionFileError("Missing end global")
-            if line.startswith("EndGlobal"):
+            if line.startswith('EndGlobal'):
                 break
             result += line
         return result
@@ -113,18 +113,18 @@ class Solution(object):
     def write(self, filename=None):
         """Save solution file."""
         filename = filename or self.filename
-        with codecs.open(filename, "wb", "utf-8-sig") as f:
-            f.write("\r\nMicrosoft Visual Studio Solution File, Format Version 11.00\r\n")
-            f.write("# Visual Studio 2010\r\n")
+        with codecs.open(filename, 'wb', 'utf-8-sig') as f:
+            f.write('\r\nMicrosoft Visual Studio Solution File, Format Version 11.00\r\n')
+            f.write('# Visual Studio 2010\r\n')
             for project in self.projects:
-                f.write("Project(\"{{{0}}}\") = \"{1}\", \"{2}\", \"{3}\"\r\n".format(*project[0:4]))
+                f.write('Project("{{{0}}}") = "{1}", "{2}", "{3}"\r\n'.format(*project[0:4]))
                 dependencies = project[4]
                 if dependencies:
-                    f.write("\tProjectSection(ProjectDependencies) = postProject\r\n")
+                    f.write('\tProjectSection(ProjectDependencies) = postProject\r\n')
                     for d in dependencies:
-                        f.write("\t\t{0} = {0}\r\n".format(d))
-                    f.write("\tEndProjectSection\r\n")
-                f.write("EndProject\r\n")
-            f.write("Global\r\n")
+                        f.write('\t\t{0} = {0}\r\n'.format(d))
+                    f.write('\tEndProjectSection\r\n')
+                f.write('EndProject\r\n')
+            f.write('Global\r\n')
             f.write(self.globals)
-            f.write("EndGlobal\r\n")
+            f.write('EndGlobal\r\n')

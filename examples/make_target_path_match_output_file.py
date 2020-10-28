@@ -33,17 +33,17 @@ def main(argv):
     solution = vcproj.solution.parse(solution_path)
     for project_file in solution.project_files():
         project = vcproj.project.parse(os.path.join(solution_dir, project_file))
-        if project.configuration_type() == "StaticLibrary":
-            project.set_output_directory("All Configurations", "All Configurations", lib_dir)
+        if project.configuration_type() == 'StaticLibrary':
+            project.set_output_directory('All Configurations', 'All Configurations', lib_dir)
         else:
-            project.set_output_directory("All Configurations", "All Configurations", bin_dir)
+            project.set_output_directory('All Configurations', 'All Configurations', bin_dir)
             # use default value for pdb file, should end up in OutDir
-            project.set_program_database_file("All Configurations", "All Configurations", None)
+            project.set_program_database_file('All Configurations', 'All Configurations', None)
 
         # set output file to got to OutDir
-        project.set_output_file("All Configurations", "All Configurations", "$(OutDir)$(TargetName)$(TargetExt)")
+        project.set_output_file('All Configurations', 'All Configurations', '$(OutDir)$(TargetName)$(TargetExt)')
         project.write()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main(sys.argv)

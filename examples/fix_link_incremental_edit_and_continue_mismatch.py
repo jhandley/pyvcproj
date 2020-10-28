@@ -24,7 +24,7 @@ def main(argv):
     solution = vcproj.solution.parse(solution_path)
     for project_file in solution.project_files():
         project = vcproj.project.parse(os.path.join(solution_dir, project_file))
-        if project.configuration_type() != "StaticLibrary":
+        if project.configuration_type() != 'StaticLibrary':
             # Check for mismatched incr linking and debug format, debug format of None means default which is EditAndContinue
             if project.enable_incremental_linking('Debug', 'Win32') == False and project.debug_information_format('Debug', 'Win32') in ['EditAndContinue', None]:
                 print("Set enable incremental to false for " + project_file)
@@ -32,5 +32,5 @@ def main(argv):
                 project.write()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main(sys.argv)
