@@ -29,4 +29,5 @@ setup(
     py_modules=['vcproj'],
     packages=['vcproj'],
     cmdclass={'test': PyTest},
+    python_requires='>=3.6',
 )
