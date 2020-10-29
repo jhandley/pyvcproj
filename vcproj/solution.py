@@ -79,15 +79,15 @@ class Solution(object):
 
     @staticmethod
     def __read_global(f):
-        result = ''
+        globals = []
         while True:
             line = f.readline()
             if line is None:
                 raise SolutionFileError("Missing end global")
             if line.startswith('EndGlobal'):
                 break
-            result += line.replace('\n', '\r\n')
-        return result
+            globals.append(line.rstrip())
+        return globals
 
     def project_files(self):
         """List project files (.vcxproj.) in solution."""
@@ -135,5 +135,6 @@ class Solution(object):
                     f.write('\tEndProjectSection\r\n')
                 f.write('EndProject\r\n')
             f.write('Global\r\n')
-            f.write(self.globals)
+            for g in self.globals:
+                f.write(f'{g}\r\n')
             f.write('EndGlobal\r\n')
