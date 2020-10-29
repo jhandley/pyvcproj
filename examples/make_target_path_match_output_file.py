@@ -27,9 +27,10 @@ def main(argv):
         print("Usage: " + argv[0] + " <solution file> <bin directory> <lib directory>")
         sys.exit(2)
     solution_path = argv[1]
-    solution_dir = os.path.dirname(solution_path)
     bin_dir = argv[2]
     lib_dir = argv[3]
+
+    solution_dir = os.path.dirname(solution_path)
     solution = vcproj.solution.parse(solution_path)
     for project_file in solution.project_files():
         project = vcproj.project.parse(os.path.join(solution_dir, project_file))
