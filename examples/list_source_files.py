@@ -1,10 +1,11 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 # List all source and include files for each project in a solution.
 
-import vcproj.solution
-import vcproj.project
 import os
+
+import vcproj.project
+import vcproj.solution
 
 solution_file = '../vcproj/tests/test_solution/test.sln'
 solution = vcproj.solution.parse(solution_file)
