@@ -15,8 +15,8 @@
 # It will then make the OutputFile property use the $OutDir variable to
 # appease the warning.
 
-import os
 import sys
+from pathlib import Path
 
 import vcproj.project
 import vcproj.solution
@@ -24,16 +24,18 @@ import vcproj.solution
 
 def main(argv):
     if len(argv) < 4:
-        print("Usage: " + argv[0] + " <solution file> <bin directory> <lib directory>")
+        print(f"Usage: {argv[0]} <solution file> <bin directory> <lib directory>")
         sys.exit(2)
     solution_path = argv[1]
     bin_dir = argv[2]
     lib_dir = argv[3]
 
-    solution_dir = os.path.dirname(solution_path)
+    solution_path = Path(solution_path)
+    solution_dir = solution_path.parent
+
     solution = vcproj.solution.parse(solution_path)
     for project_file in solution.project_files():
-        project = vcproj.project.parse(os.path.join(solution_dir, project_file))
+        project = vcproj.project.parse(solution_dir / project_file)
         if project.configuration_type() == 'StaticLibrary':
             project.set_output_directory('All Configurations', 'All Configurations', lib_dir)
         else:
