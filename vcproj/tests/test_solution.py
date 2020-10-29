@@ -6,7 +6,7 @@ import pytest
 import vcproj.solution
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope='session')
 def test_sol():
     return vcproj.solution.parse('vcproj/tests/test_solution/test.sln')
 
