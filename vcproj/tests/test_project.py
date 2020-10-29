@@ -31,14 +31,14 @@ def test_additional_link_dependencies():
             ['somethingextra.lib', 'kernel32.lib', 'user32.lib', 'gdi32.lib', 'winspool.lib', 'comdlg32.lib', 'advapi32.lib', 'shell32.lib', 'ole32.lib', 'oleaut32.lib', 'uuid.lib', 'odbc32.lib', 'odbccp32.lib', '%(AdditionalDependencies)'])
     assert (p.additional_link_dependencies('Release', 'Win32') ==
             ['somethingextra.lib', 'somethingelse.lib', 'kernel32.lib', 'user32.lib', 'gdi32.lib', 'winspool.lib', 'comdlg32.lib', 'advapi32.lib', 'shell32.lib', 'ole32.lib', 'oleaut32.lib', 'uuid.lib', 'odbc32.lib', 'odbccp32.lib', '%(AdditionalDependencies)'])
-    assert (p.additional_link_dependencies('Foo', 'Win32') == None)
+    assert (p.additional_link_dependencies('Foo', 'Win32') is None)
 
 
 def test_additional_include_directories():
     p = vcproj.project.parse('vcproj/tests/test_solution/test/test.vcxproj')
     assert (p.additional_include_directories('Debug', 'Win32') == ['..', 'foo/bar'])
-    assert (p.additional_include_directories('Release', 'Win32') == None)
-    assert (p.additional_include_directories('Foo', 'Win32') == None)
+    assert (p.additional_include_directories('Release', 'Win32') is None)
+    assert (p.additional_include_directories('Foo', 'Win32') is None)
 
 
 def test_set_additional_include_directories():
@@ -48,7 +48,7 @@ def test_set_additional_include_directories():
     p.set_additional_include_directories('All Configurations', 'All Configurations', ['blaa', 'blaaa'])
     assert (p.additional_include_directories('Release', 'Win32') == ['blaa', 'blaaa'])
     p.set_additional_include_directories('Release', 'Win32', None)
-    assert (p.additional_include_directories('Release', 'Win32') == None)
+    assert (p.additional_include_directories('Release', 'Win32') is None)
 
 
 def test_output_file():
@@ -70,7 +70,7 @@ def test_set_output_file():
 def test_output_directory():
     p = vcproj.project.parse('vcproj/tests/test_solution/test/test.vcxproj')
     assert (p.output_directory('Debug', 'Win32') == '$(SolutionDir)$(Configuration)\\bin')
-    assert (p.output_directory('Release', 'Win32') == None)
+    assert (p.output_directory('Release', 'Win32') is None)
 
 
 def test_set_output_directory():
@@ -78,7 +78,7 @@ def test_set_output_directory():
     p.set_output_directory('Debug', 'Win32', 'C:\\foo\\bar')
     assert (p.output_directory('Debug', 'Win32') == 'C:\\foo\\bar')
     p.set_output_directory('Debug', 'Win32', None)
-    assert (p.output_directory('Debug', 'Win32') == None)
+    assert (p.output_directory('Debug', 'Win32') is None)
     p.set_output_directory('All Configurations', 'All Configurations', 'C:\\foo\\bar')
     assert (p.output_directory('Debug', 'Win32') == 'C:\\foo\\bar')
     assert (p.output_directory('Release', 'Win32') == 'C:\\foo\\bar')
@@ -87,7 +87,7 @@ def test_set_output_directory():
 def test_program_database_file():
     p = vcproj.project.parse('vcproj/tests/test_solution/test/test.vcxproj')
     assert (p.program_database_file('Debug', 'Win32') == '$(TargetDir)test.pdb')
-    assert (p.program_database_file('Release', 'Win32') == None)
+    assert (p.program_database_file('Release', 'Win32') is None)
 
 
 def test_set_program_database_file():
@@ -97,13 +97,13 @@ def test_set_program_database_file():
     p.set_program_database_file('All Configurations', 'All Configurations', 'blaablaa')
     assert (p.program_database_file('Release', 'Win32') == 'blaablaa')
     p.set_program_database_file('Debug', 'Win32', None)
-    assert (p.program_database_file('Debug', 'Win32') == None)
+    assert (p.program_database_file('Debug', 'Win32') is None)
 
 
 def test_debug_information_format():
     p = vcproj.project.parse('vcproj/tests/test_solution/test/test.vcxproj')
     assert (p.debug_information_format('Debug', 'Win32') == 'EditAndContinue')
-    assert (p.debug_information_format('Release', 'Win32') == None)
+    assert (p.debug_information_format('Release', 'Win32') is None)
 
 
 def test_set_debug_information_format():
@@ -115,13 +115,13 @@ def test_set_debug_information_format():
 
 def test_enable_incremental_linking():
     p = vcproj.project.parse('vcproj/tests/test_solution/test/test.vcxproj')
-    assert (p.enable_incremental_linking('Debug', 'Win32') == True)
-    assert (p.enable_incremental_linking('Release', 'Win32') == False)
+    assert (p.enable_incremental_linking('Debug', 'Win32') is True)
+    assert (p.enable_incremental_linking('Release', 'Win32') is False)
 
 
 def test_set_enable_incremental_link():
     p = vcproj.project.parse('vcproj/tests/test_solution/test/test.vcxproj')
     p.set_enable_incremental_linking('Debug', 'Win32', False)
-    assert (p.enable_incremental_linking('Debug', 'Win32') == False)
+    assert (p.enable_incremental_linking('Debug', 'Win32') is False)
     p.set_enable_incremental_linking('Release', 'Win32', None)
-    assert (p.enable_incremental_linking('Release', 'Win32') == None)
+    assert (p.enable_incremental_linking('Release', 'Win32') is None)
