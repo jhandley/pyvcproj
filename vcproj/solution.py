@@ -102,7 +102,7 @@ class Solution(object):
         project = self.__project_from_name(project_name)
         if not project:
             raise SolutionFileError(f"Can't find project with name {project_name}")
-        return map(lambda d: self.__project_from_id(d)[1], project.dependencies)
+        return map(lambda d: self.__project_from_id(d).name, project.dependencies)
 
     def set_dependencies(self, project_name, dependencies):
         """Set names of projects dependent on project *project_name* to *dependencies*"""
@@ -110,7 +110,7 @@ class Solution(object):
         if not project:
             raise SolutionFileError(f"Can't find project with name {project_name}")
         project.dependencies.clear()
-        project.dependencies.extend(self.__project_from_name(d)[3] for d in dependencies)
+        project.dependencies.extend(self.__project_from_name(d).guid for d in dependencies)
 
     def __project_from_name(self, project_name):
         return next((p for p in self.projects if p.name == project_name), None)
@@ -125,11 +125,10 @@ class Solution(object):
             f.write('\r\nMicrosoft Visual Studio Solution File, Format Version 11.00\r\n')
             f.write('# Visual Studio 2010\r\n')
             for p in self.projects:
-                f.write(f'Project("{p[0]}") = "{p[1]}", "{p[2]}", "{p[3]}"\r\n')
-                dependencies = p[4]
-                if dependencies:
+                f.write(f'Project("{p.type_guid}") = "{p.name}", "{p.path}", "{p.guid}"\r\n')
+                if p.dependencies:
                     f.write('\tProjectSection(ProjectDependencies) = postProject\r\n')
-                    for d in dependencies:
+                    for d in p.dependencies:
                         f.write(f'\t\t{d} = {d}\r\n')
                     f.write('\tEndProjectSection\r\n')
                 f.write('EndProject\r\n')
