@@ -37,10 +37,10 @@ class Solution(object):
         """Create a Solution instance for solution file *name*."""
         self.filename = filename
         self.projects = []
-        with open(self.filename, 'rb') as f:
+        with open(self.filename, encoding='utf-8-sig') as f:
             line = f.readline()
             while line:
-                line = f.readline().decode('utf-8')
+                line = f.readline()
                 if line.startswith('Project'):
                     match = _REGEX_PROJECT_FILE.match(line)
                     if match:
@@ -54,7 +54,7 @@ class Solution(object):
     def __read_project(project, f):
         dependencies = []
         while True:
-            line = f.readline().decode('utf-8')
+            line = f.readline()
             if line is None:
                 raise SolutionFileError("Missing end project")
             if _REGEX_END_PROJECT.match(line):
@@ -67,7 +67,7 @@ class Solution(object):
     def __read_dependencies(f):
         dependencies = []
         while True:
-            line = f.readline().decode('utf-8')
+            line = f.readline()
             if line is None:
                 raise SolutionFileError("Missing end dependencies section")
             if _REGEX_END_PROJECT_SECTION.match(line):
@@ -81,12 +81,12 @@ class Solution(object):
     def __read_global(f):
         result = ''
         while True:
-            line = f.readline().decode('utf-8')
+            line = f.readline()
             if line is None:
                 raise SolutionFileError("Missing end global")
             if line.startswith('EndGlobal'):
                 break
-            result += line
+            result += line.replace('\n', '\r\n')
         return result
 
     def project_files(self):
