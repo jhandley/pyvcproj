@@ -20,6 +20,7 @@ def main(argv):
         print("Usage: " + argv[0] + " <solution file>")
         sys.exit(2)
     solution_path = argv[1]
+
     solution_dir = os.path.dirname(solution_path)
     solution = vcproj.solution.parse(solution_path)
     for project_file in solution.project_files():
