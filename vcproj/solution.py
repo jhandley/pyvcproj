@@ -116,8 +116,7 @@ class Solution(object):
         return next((p for p in self.projects if p.name == project_name), None)
 
     def __project_from_id(self, project_id):
-        projs = list(filter(lambda p: p.guid == project_id, self.projects))
-        return projs[0]
+        return next(filter(lambda p: p.guid == project_id, self.projects))
 
     def write(self, filename=None):
         """Save solution file."""
