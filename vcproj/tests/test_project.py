@@ -19,8 +19,10 @@ def test_configurations():
 def test_configuration_type():
     test = vcproj.project.parse('vcproj/tests/test_solution/test/test.vcxproj')
     assert (test.configuration_type() == 'Application')
+
     lib1 = vcproj.project.parse('vcproj/tests/test_solution/lib1/lib1.vcxproj')
     assert (lib1.configuration_type() == 'DynamicLibrary')
+
     lib2 = vcproj.project.parse('vcproj/tests/test_solution/lib2/lib2.vcxproj')
     assert (lib2.configuration_type() == 'StaticLibrary')
 
@@ -45,8 +47,10 @@ def test_set_additional_include_directories():
     p = vcproj.project.parse('vcproj/tests/test_solution/test/test.vcxproj')
     p.set_additional_include_directories('Debug', 'Win32', ['foo', 'bar'])
     assert (p.additional_include_directories('Debug', 'Win32') == ['foo', 'bar'])
+
     p.set_additional_include_directories('All Configurations', 'All Configurations', ['blaa', 'blaaa'])
     assert (p.additional_include_directories('Release', 'Win32') == ['blaa', 'blaaa'])
+
     p.set_additional_include_directories('Release', 'Win32', None)
     assert (p.additional_include_directories('Release', 'Win32') is None)
 
@@ -54,6 +58,7 @@ def test_set_additional_include_directories():
 def test_output_file():
     test = vcproj.project.parse('vcproj/tests/test_solution/test/test.vcxproj')
     assert (test.output_file('Debug', 'Win32') == '$(OutDir)test.exe')
+
     lib2 = vcproj.project.parse('vcproj/tests/test_solution/lib2/lib2.vcxproj')
     assert (lib2.output_file('Debug', 'Win32') == '$(OutDir)$(TargetName)$(TargetExt)')
 
@@ -62,6 +67,7 @@ def test_set_output_file():
     test = vcproj.project.parse('vcproj/tests/test_solution/test/test.vcxproj')
     test.set_output_file('All Configurations', 'All Configurations', 'blaaaaa.exe')
     assert (test.output_file('Debug', 'Win32') == 'blaaaaa.exe')
+
     lib2 = vcproj.project.parse('vcproj/tests/test_solution/lib2/lib2.vcxproj')
     lib2.set_output_file('Debug', 'Win32', 'ughughugh.lib')
     assert (lib2.output_file('Debug', 'Win32') == 'ughughugh.lib')
@@ -77,8 +83,10 @@ def test_set_output_directory():
     p = vcproj.project.parse('vcproj/tests/test_solution/test/test.vcxproj')
     p.set_output_directory('Debug', 'Win32', 'C:\\foo\\bar')
     assert (p.output_directory('Debug', 'Win32') == 'C:\\foo\\bar')
+
     p.set_output_directory('Debug', 'Win32', None)
     assert (p.output_directory('Debug', 'Win32') is None)
+
     p.set_output_directory('All Configurations', 'All Configurations', 'C:\\foo\\bar')
     assert (p.output_directory('Debug', 'Win32') == 'C:\\foo\\bar')
     assert (p.output_directory('Release', 'Win32') == 'C:\\foo\\bar')
@@ -94,8 +102,10 @@ def test_set_program_database_file():
     p = vcproj.project.parse('vcproj/tests/test_solution/test/test.vcxproj')
     p.set_program_database_file('Debug', 'Win32', 'foobar')
     assert (p.program_database_file('Debug', 'Win32') == 'foobar')
+
     p.set_program_database_file('All Configurations', 'All Configurations', 'blaablaa')
     assert (p.program_database_file('Release', 'Win32') == 'blaablaa')
+
     p.set_program_database_file('Debug', 'Win32', None)
     assert (p.program_database_file('Debug', 'Win32') is None)
 
@@ -123,5 +133,6 @@ def test_set_enable_incremental_link():
     p = vcproj.project.parse('vcproj/tests/test_solution/test/test.vcxproj')
     p.set_enable_incremental_linking('Debug', 'Win32', False)
     assert (p.enable_incremental_linking('Debug', 'Win32') is False)
+
     p.set_enable_incremental_linking('Release', 'Win32', None)
     assert (p.enable_incremental_linking('Release', 'Win32') is None)
