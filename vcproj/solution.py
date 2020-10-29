@@ -8,7 +8,7 @@ from collections import namedtuple
 
 _Project = namedtuple('_Project', 'type_guid,name,path,guid,dependencies')
 _REGEX_PROJECT_FILE = re.compile(r'''
-    Project\("\{([\w-]+)\}"\)  # type_guid 
+    Project\("(\{[\w-]+\})"\)  # type_guid 
     [\s=]+
     "([^\"]+)",\s              # name
     "(.+proj)",\s+             # path
@@ -125,7 +125,7 @@ class Solution(object):
             f.write('\r\nMicrosoft Visual Studio Solution File, Format Version 11.00\r\n')
             f.write('# Visual Studio 2010\r\n')
             for p in self.projects:
-                f.write(f'Project("{{{p[0]}}}") = "{p[1]}", "{p[2]}", "{p[3]}"\r\n')
+                f.write(f'Project("{p[0]}") = "{p[1]}", "{p[2]}", "{p[3]}"\r\n')
                 dependencies = p[4]
                 if dependencies:
                     f.write('\tProjectSection(ProjectDependencies) = postProject\r\n')
