@@ -23,7 +23,7 @@ import vcproj.solution
 
 
 def main(argv):
-    if len(argv) < 3:
+    if len(argv) < 4:
         print("Usage: " + argv[0] + " <solution file> <bin directory> <lib directory>")
         sys.exit(2)
     solution_path = argv[1]
