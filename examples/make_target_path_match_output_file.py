@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 # Fixes the following warning:
 #   warning MSB8012: TargetPath does not match the Linker's OutputFile

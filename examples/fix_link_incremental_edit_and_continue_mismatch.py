@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 # Fixes the following warning:
 #      warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/INCREMENTAL:NO'
