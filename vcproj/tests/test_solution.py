@@ -8,7 +8,7 @@ import vcproj.solution
 
 @pytest.fixture(scope='session')
 def test_sol():
-    return vcproj.solution.parse('vcproj/tests/test_solution/test.sln')
+    return vcproj.solution.parse('vcproj/tests/test_solution/vc2010.sln')
 
 
 def test_project_files(test_sol):
@@ -29,8 +29,8 @@ def test_set_dependencies(test_sol):
 
 
 def test_write():
-    s = vcproj.solution.parse('vcproj/tests/test_solution/test.sln')
+    s = vcproj.solution.parse('vcproj/tests/test_solution/vc2010.sln')
     temp = tempfile.NamedTemporaryFile()
     temp.close()
     s.write(temp.name)
-    assert filecmp.cmp('vcproj/tests/test_solution/test.sln', temp.name)
+    assert filecmp.cmp('vcproj/tests/test_solution/vc2010.sln', temp.name)
