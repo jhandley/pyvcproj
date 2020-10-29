@@ -6,7 +6,7 @@ import xml.etree.ElementTree as ET
 __all__ = ['Project', 'parse']
 
 _MS_BUILD_NAMESPACE = 'http://schemas.microsoft.com/developer/msbuild/2003'
-_REGEX_CONFIG_CONDITION = re.compile(r"""'\$\(Configuration\)\|\$\(Platform\)'=='(\w+)\|(\w+)'""")
+_REGEX_CONFIG_CONDITION = re.compile(r"'\$\(Configuration\)\|\$\(Platform\)'=='(\w+)\|(\w+)'")
 
 
 def parse(filename):
