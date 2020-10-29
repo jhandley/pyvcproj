@@ -7,17 +7,18 @@ import re
 from collections import namedtuple
 
 _Project = namedtuple('_Project', 'type_guid,name,path,guid,dependencies')
-_REGEX_PROJECT_FILE = re.compile(r'''
-    Project\("(\{[\w-]+\})"\)  # type_guid 
+_GUID = r'\{[\w-]+\}'
+_REGEX_PROJECT_FILE = re.compile(rf'''
+    Project\("({_GUID})"\)  # type_guid
     [\s=]+
-    "([^\"]+)",\s              # name
-    "(.+proj)",\s+             # path
-    "(\{[\w-]+\})"             # guid
+    "([^"]+)",\s            # name
+    "(.+proj)",\s+          # path
+    "({_GUID})"             # guid
 ''', re.X)
 _REGEX_END_PROJECT = re.compile(r'\s*EndProject')
 _REGEX_PROJECT_DEPENDENCIES_SECTION = re.compile(r'\s*ProjectSection\((\w+)\) = postProject')
 _REGEX_END_PROJECT_SECTION = re.compile(r'\s*EndProjectSection')
-_REGEX_DEPENDENCY = re.compile(r'\s*(\{[\w-]+\})\s*=\s*(\{[\w-]+\})')
+_REGEX_DEPENDENCY = re.compile(rf'\s*({_GUID})\s*=\s*({_GUID})')
 
 
 def parse(filename):
