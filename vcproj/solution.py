@@ -109,8 +109,8 @@ class Solution(object):
         project = self.__project_from_name(project_name)
         if not project:
             raise SolutionFileError(f"Can't find project with name {project_name}")
-        index = self.projects.index(project)
-        self.projects[index] = _Project(*project[0:4], list(map(lambda d: self.__project_from_name(d)[3], dependencies)))
+        project.dependencies.clear()
+        project.dependencies.extend(self.__project_from_name(d)[3] for d in dependencies)
 
     def __project_from_name(self, project_name):
         return next((p for p in self.projects if p.name == project_name), None)
