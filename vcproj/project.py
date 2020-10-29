@@ -23,20 +23,12 @@ def _matches_platform_configuration(condition, platform, configuration):
     return (platform == 'All Configurations' or p == platform) and (configuration == 'All Configurations' or c == configuration)
 
 
-# ET.register_namespace doesn't exist before python 2.7
-try:
-    _register_namespace = ET.register_namespace
-except AttributeError:
-    def _register_namespace(prefix, uri):
-        ET._namespace_map[uri] = prefix
-
-
 class Project(object):
     """Visual C++ project file (.vcxproj)."""
 
     def __init__(self, filename):
         """Create a Project instance for project file *filename*."""
-        _register_namespace('', _MS_BUILD_NAMESPACE)
+        ET.register_namespace('', _MS_BUILD_NAMESPACE)
         self.filename = filename
         self.xml = ET.parse(filename)
 
