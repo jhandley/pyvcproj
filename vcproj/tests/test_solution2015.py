@@ -12,6 +12,7 @@ def test_sol():
 
 
 def test_all_projects(test_sol):
+    # FIXME: No assert
     projects = test_sol.project_names()
     len(list(projects)) == 59
 
@@ -37,12 +38,14 @@ def test_dependencies(test_sol):
 
 
 def test_set_dependencies():
+    # FIXME: Testing against wrong version
     s = vcproj.solution.parse('vcproj/tests/test_solution/vc2010.sln')
     s.set_dependencies('lib1', ['lib2'])
     assert list(s.dependencies('lib1')) == ['lib2']
 
 
 def test_write():
+    # FIXME: Testing against wrong version
     s = vcproj.solution.parse('vcproj/tests/test_solution/vc2010.sln')
     temp = tempfile.NamedTemporaryFile()
     temp.close()
