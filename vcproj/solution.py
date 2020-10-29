@@ -2,7 +2,6 @@
 
 __all__ = ['Solution', 'parse']
 
-import codecs
 import re
 from collections import namedtuple
 
@@ -121,18 +120,19 @@ class Solution(object):
     def write(self, filename=None):
         """Save solution file."""
         filename = filename or self.filename
-        with codecs.open(filename, 'wb', 'utf-8-sig') as f:
-            f.write('\r\nMicrosoft Visual Studio Solution File, Format Version 11.00\r\n')
-            f.write('# Visual Studio 2010\r\n')
+        with open(filename, 'w', encoding='utf-8-sig', newline='\r\n') as f:
+            print(file=f)
+            print('Microsoft Visual Studio Solution File, Format Version 11.00', file=f)
+            print('# Visual Studio 2010', file=f)
             for p in self.projects:
-                f.write(f'Project("{p.type_guid}") = "{p.name}", "{p.path}", "{p.guid}"\r\n')
+                print(f'Project("{p.type_guid}") = "{p.name}", "{p.path}", "{p.guid}"', file=f)
                 if p.dependencies:
-                    f.write('\tProjectSection(ProjectDependencies) = postProject\r\n')
+                    print('\tProjectSection(ProjectDependencies) = postProject', file=f)
                     for d in p.dependencies:
-                        f.write(f'\t\t{d} = {d}\r\n')
-                    f.write('\tEndProjectSection\r\n')
-                f.write('EndProject\r\n')
-            f.write('Global\r\n')
+                        print(f'\t\t{d} = {d}', file=f)
+                    print('\tEndProjectSection', file=f)
+                print('EndProject', file=f)
+            print('Global', file=f)
             for g in self.globals:
-                f.write(f'{g}\r\n')
-            f.write('EndGlobal\r\n')
+                print(f'{g}', file=f)
+            print('EndGlobal', file=f)
