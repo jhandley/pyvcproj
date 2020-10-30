@@ -6,7 +6,8 @@ import xml.etree.ElementTree as ET
 __all__ = ['Project', 'parse']
 
 _MS_BUILD_NAMESPACE = 'http://schemas.microsoft.com/developer/msbuild/2003'
-_REGEX_CONFIG_CONDITION = re.compile(r"""'\$\(Configuration\)\|\$\(Platform\)'=='(\w+)\|(\w+)'""")
+_REGEX_CONFIG_CONDITION = re.compile(r"'\$\(Configuration\)\|\$\(Platform\)'=='(\w+)\|(\w+)'")
+_NS = {'MSB': _MS_BUILD_NAMESPACE}
 
 
 def parse(filename):
@@ -23,20 +24,11 @@ def _matches_platform_configuration(condition, platform, configuration):
     return (platform == 'All Configurations' or p == platform) and (configuration == 'All Configurations' or c == configuration)
 
 
-# ET.register_namespace doesn't exist before python 2.7
-try:
-    _register_namespace = ET.register_namespace
-except AttributeError:
-    def _register_namespace(prefix, uri):
-        ET._namespace_map[uri] = prefix
-
-
 class Project(object):
     """Visual C++ project file (.vcxproj)."""
 
     def __init__(self, filename):
         """Create a Project instance for project file *filename*."""
-        _register_namespace('', _MS_BUILD_NAMESPACE)
         self.filename = filename
         self.xml = ET.parse(filename)
 
@@ -46,56 +38,56 @@ class Project(object):
 
     def configurations(self, platform='All Configurations', configuration='All Configurations'):
         """List available configurations for this project as list of tuples (config, platform)"""
-        item_groups = self.xml.findall('./{' + _MS_BUILD_NAMESPACE + '}ItemGroup')
+        item_groups = self.xml.findall('./MSB:ItemGroup', _NS)
         config_groups = (item_group for item_group in item_groups if item_group.attrib.get('Label', None) == 'ProjectConfigurations')
         config_group = next(config_groups, None)
         for config_item in config_group:
-            item_config = config_item.find('./{' + _MS_BUILD_NAMESPACE + '}Configuration').text
-            item_platform = config_item.find('./{' + _MS_BUILD_NAMESPACE + '}Platform').text
+            item_config = config_item.find('./MSB:Configuration', _NS).text
+            item_platform = config_item.find('./MSB:Platform', _NS).text
             if (platform == 'All Configurations' or item_platform == platform) and (configuration == 'All Configurations' or item_config == configuration):
                 yield (item_config, item_platform)
 
     def source_files(self):
         """List source files in project."""
-        return [c.attrib['Include'] for c in self.xml.findall('.//{' + _MS_BUILD_NAMESPACE + '}ClCompile') if 'Include' in c.attrib]
+        return [c.attrib['Include'] for c in self.xml.findall('.//MSB:ClCompile', _NS) if 'Include' in c.attrib]
 
     def include_files(self):
         """List include files in project."""
-        return [c.attrib['Include'] for c in self.xml.findall('.//{' + _MS_BUILD_NAMESPACE + '}ClInclude') if 'Include' in c.attrib]
+        return [c.attrib['Include'] for c in self.xml.findall('.//MSB:ClInclude', _NS) if 'Include' in c.attrib]
 
     def __item_groups_for_config(self, platform, configuration):
-        groups = self.xml.findall('./{' + _MS_BUILD_NAMESPACE + '}ItemDefinitionGroup')
+        groups = self.xml.findall('./MSB:ItemDefinitionGroup', _NS)
         return list(filter(lambda g: _matches_platform_configuration(g.attrib['Condition'], platform, configuration), groups))
 
     def __item_group_item_for_config(self, platform, configuration, subgroup_name, item_name):
         groups = self.__item_groups_for_config(platform, configuration)
         if len(groups) == 0:
             return None
-        item = groups[0].find('{' + _MS_BUILD_NAMESPACE + '}' + subgroup_name + '/{' + _MS_BUILD_NAMESPACE + '}' + item_name)
+        item = groups[0].find(f'MSB:{subgroup_name}/MSB:{item_name}', _NS)
         return item.text if item is not None else None
 
     def __set_item_group_items_for_config(self, platform, configuration, subgroup_name, item_name, val):
         groups = self.__item_groups_for_config(platform, configuration)
         for group in groups:
-            subgroup = group.find('{' + _MS_BUILD_NAMESPACE + '}' + subgroup_name)
+            subgroup = group.find(f'MSB:{subgroup_name}', _NS)
             if subgroup is None:
                 continue
-            item = subgroup.find('{' + _MS_BUILD_NAMESPACE + '}' + item_name)
+            item = subgroup.find(f'MSB:{item_name}', _NS)
             if val is None:
                 # remove the node to get 'inherit from project defaults'
                 if item is not None:
                     subgroup.remove(item)
             else:
                 if item is None:
-                    item = ET.SubElement(subgroup, '{' + _MS_BUILD_NAMESPACE + '}' + item_name)
+                    item = ET.SubElement(subgroup, f'{{{_MS_BUILD_NAMESPACE}}}{item_name}')
                 item.text = val
 
     def __property_group_item_for_config(self, platform, configuration, label, item_name):
-        property_groups = self.xml.findall('./{' + _MS_BUILD_NAMESPACE + '}PropertyGroup')
+        property_groups = self.xml.findall('./MSB:PropertyGroup', _NS)
         matching_groups = (group for group in property_groups if group.attrib.get('Label', None) == label)
         for group in matching_groups:
             if 'Condition' not in group.attrib or _matches_platform_configuration(group.attrib['Condition'], platform, configuration):
-                items = group.findall('{' + _MS_BUILD_NAMESPACE + '}' + item_name)
+                items = group.findall(f'MSB:{item_name}', _NS)
                 for item in items:
                     if item is not None:
                         if 'Condition' not in item.attrib or _matches_platform_configuration(item.attrib['Condition'], platform, configuration):
@@ -109,7 +101,7 @@ class Project(object):
             for config in self.configurations(platform, configuration):
                 self.__set_property_group_items_for_config(config[0], config[1], label, item_name, val)
         else:
-            property_groups = self.xml.findall('./{' + _MS_BUILD_NAMESPACE + '}PropertyGroup')
+            property_groups = self.xml.findall('./MSB:PropertyGroup', _NS)
             label_matching_groups = (group for group in property_groups if group.attrib.get('Label', None) == label)
             condition_matching_groups = (g for g in label_matching_groups
                                          if 'Condition' not in g.attrib or
@@ -122,7 +114,7 @@ class Project(object):
                 # and each child has a condition.
                 if group_condition is None:
                     # No condition on group, must be conditions on the items
-                    items = group.findall('{' + _MS_BUILD_NAMESPACE + '}' + item_name)
+                    items = group.findall(f'MSB:{item_name}', _NS)
                     item = next((item for item in items if _matches_platform_configuration(item.attrib['Condition'], platform, configuration)), None)
                     if val is None:
                         if item is not None:
@@ -130,19 +122,19 @@ class Project(object):
                             group.remove(item)
                     else:
                         if item is None:
-                            item = ET.SubElement(group, '{' + _MS_BUILD_NAMESPACE + '}' + item_name)
-                            item.attrib['Condition'] = "'$(Configuration)|$(Platform)'=='{0}|{1}'".format(configuration, platform)
+                            item = ET.SubElement(group, f'{{{_MS_BUILD_NAMESPACE}}}{item_name}')
+                            item.attrib['Condition'] = f"'$(Configuration)|$(Platform)'=='{configuration}|{platform}'"
                         item.text = val
                 else:
                     # condition on group so none on items
-                    item = group.find('{' + _MS_BUILD_NAMESPACE + '}' + item_name)
+                    item = group.find(f'MSB:{item_name}', _NS)
                     if val is None:
                         if item is not None:
                             # remove the node to get 'inherit from project defaults'
                             group.remove(item)
                     else:
                         if item is None:
-                            item = ET.SubElement(group, '{' + _MS_BUILD_NAMESPACE + '}' + item_name)
+                            item = ET.SubElement(group, f'{{{_MS_BUILD_NAMESPACE}}}{item_name}')
                     item.text = val
 
     def additional_link_dependencies(self, platform, configuration):
