@@ -49,11 +49,15 @@ class Project(object):
 
     def source_files(self):
         """List source files in project."""
-        return [c.attrib['Include'] for c in self.xml.findall('.//MSB:ClCompile', _NS) if 'Include' in c.attrib]
+        return self.generic_files('ClCompile')
 
     def include_files(self):
         """List include files in project."""
-        return [c.attrib['Include'] for c in self.xml.findall('.//MSB:ClInclude', _NS) if 'Include' in c.attrib]
+        return self.generic_files('ClInclude')
+
+    def generic_files(self, name):
+        """Function to find files based on a given name/type."""
+        return [c.attrib['Include'] for c in self.xml.findall(f'.//MSB:{name}', _NS) if 'Include' in c.attrib]
 
     def __item_groups_for_config(self, platform, configuration):
         groups = self.xml.findall('./MSB:ItemDefinitionGroup', _NS)
