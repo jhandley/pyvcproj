@@ -28,7 +28,6 @@ class Project(object):
 
     def __init__(self, filename):
         """Create a Project instance for project file *filename*."""
-        ET.register_namespace('', _MS_BUILD_NAMESPACE)
         self.filename = filename
         self.xml = ET.parse(filename)
 
