@@ -1,6 +1,10 @@
+#!/usr/bin/env python
+
+import sys
+
 from setuptools import setup
 from setuptools.command.test import test as TestCommand
-import sys
+
 
 class PyTest(TestCommand):
     def finalize_options(self):
@@ -14,14 +18,16 @@ class PyTest(TestCommand):
         sys.exit(errno)
 
 
-setup(name='vcproj',
-      version='0.1.0',
-      description='Manipulate Visual C++ Project Files',
-      author='Josh Handley',
-      author_email='josh@teleyah.com',
-      tests_require=['pytest'],
-      url='http://github.com/jhandley/pyvcproj',
-      py_modules=['vcproj'],
-      packages=['vcproj'],
-      cmdclass={'test': PyTest},
-     )
+setup(
+    name='vcproj',
+    version='0.1.0',
+    description='Manipulate Visual C++ Project Files',
+    author='Josh Handley',
+    author_email='josh@teleyah.com',
+    tests_require=['pytest'],
+    url='http://github.com/jhandley/pyvcproj',
+    py_modules=['vcproj'],
+    packages=['vcproj'],
+    cmdclass={'test': PyTest},
+    python_requires='>=3.6',
+)
